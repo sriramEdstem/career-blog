@@ -1,0 +1,11 @@
+.image-container {
+  transition: transform 1s ease;
+}
+
+.dark {
+  background-color: slate-700;
+}
+
+.header {
+  font-family: "Roboto Mono", monospace;
+}

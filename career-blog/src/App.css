@@ -1,0 +1,12 @@
+body {
+  font-family: "IBM Plex Mono", monospace;
+  min-height: 100vh;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+}
+.article {
+  flex: 1;
+}
