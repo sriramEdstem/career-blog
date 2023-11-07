@@ -7,7 +7,6 @@ const Blog = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
-  const [disabled, setDisabled] = useState(false);
   const [catg, setCatg] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -84,13 +83,19 @@ const Blog = () => {
     <>
       <Header></Header>
       <div className="flex flex-col justify-center text-left mx-auto w-[50%]">
-        <h1>tags:</h1>
-        <div>
+        <h1 className="mt-8">tags:</h1>
+        <div className="">
+          <span
+            onClick={() => setSelectedCategory(null)}
+            className="mr-4 cursor-pointer text-[14px] dark:text-white dark:bg-light-brown dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black px-1 leading-0 text-black transition-all duration-300"
+          >
+            #AllCategory
+          </span>
           {catg.map((item, index) => (
             <span
               key={index}
               onClick={() => setSelectedCategory(item)}
-              className="mr-2 cursor-pointer text-[14px] dark.text-white dark.bg-light-brown dark:hover.bg-dark-brown dark.hover.text-white hover.bg-dark-gold bg-light-gold hover.text-black px-1 leading-0 text-black transition-all duration-300"
+              className="mr-4 cursor-pointer text-[14px] dark:text-white dark:bg-light-brown dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black px-1 leading-0 text-black transition-all duration-300"
             >
               {"#"}
               {item}
@@ -98,7 +103,7 @@ const Blog = () => {
           ))}
         </div>
         {years.map((year) => (
-          <div key={year} className="year-section flex flex-col gap-12 mt-20">
+          <div key={year} className=" flex flex-col gap-12 mt-12">
             <h2 className="font-semibold text-xl">{year}</h2>
             <div className="flex flex-col gap-10">
               {postsByYear[year]
@@ -113,11 +118,11 @@ const Blog = () => {
                   return (
                     <div key={post.id} className="post">
                       <div className="flex items-center">
-                        <div className="text-lg pt-[1px] w-20">
+                        <div className="text-base font-extralight pt-[1px] w-20">
                           {formatDate(post.date)}
                         </div>
                         <Link to={`/blogs/${post.id}`}>
-                          <h1 className="dark:text-white dark:hover:bg-opacity-50 dark.bg-opacity-70 dark.bg-blue-300 hover.bg-blue-100 bg-opacity-50 bg-blue-300 hover.text-black hover.bg-opacity-70 px-4 text-black text-lg transition-all duration-300">
+                          <h1 className="dark:text-white dark:hover:bg-opacity-50 dark:bg-opacity-70 dark:bg-blue-300 hover:bg-blue-100 bg-opacity-50 bg-blue-300 hover:text-black hover:bg-opacity-70 px-4 text-black text-lg transition-all duration-300">
                             {post.title}
                           </h1>
                         </Link>
@@ -130,7 +135,7 @@ const Blog = () => {
                               <span
                                 key={index}
                                 onClick={() => setSelectedCategory(category)}
-                                className=" mr-2 text-[14px] dark.text-white dark.bg-light-brown cursor-pointer  dark:hover.bg-dark-brown dark.hover.text-white hover.bg-dark-gold  bg-light-gold hover.text-black  px-1 leading-0 text-black transition-all duration-300"
+                                className=" mr-2 text-[14px] dark:text-white dark:bg-light-brown cursor-pointer  dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold  bg-light-gold hover:text-black  px-1 leading-0 text-black transition-all duration-300"
                               >
                                 {"#"}
                                 {category}
@@ -149,7 +154,7 @@ const Blog = () => {
         <div>
           <button
             disabled={currentPage <= 1}
-            className="dark.text-black disabled:bg-slate-300 disabled:opacity-60 px-2 py-1 rounded bg-slate-200"
+            className="dark:text-black disabled:bg-slate-300 disabled:opacity-60 px-2 py-1 rounded bg-slate-200"
             onClick={previous}
           >
             Previous Page
@@ -158,7 +163,7 @@ const Blog = () => {
         <div>
           <button
             disabled={currentPage >= totalPagess}
-            className=" dark.text-black disabled:bg-slate-300 disabled:opacity-60  px-2 py-1 rounded bg-slate-200"
+            className=" dark:text-black disabled:bg-slate-300 disabled:opacity-60  px-2 py-1 rounded bg-slate-200"
             onClick={nextPage}
           >
             Next Page
