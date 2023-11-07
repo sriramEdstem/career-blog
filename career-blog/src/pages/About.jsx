@@ -6,7 +6,6 @@ const About = () => {
     <>
       <Header></Header>
       <h1>Fluffy McFlufferson</h1>
-      <h1>Meow Meow</h1>
       <img src={cat} alt="cat"></img>
       <div>
         <p>
