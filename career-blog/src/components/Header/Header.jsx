@@ -22,7 +22,7 @@ function Header() {
           <p className="  ">{currTime}</p>
           <p className=" ">{location}</p>
         </div>
-        <Link to="/">ME</Link>
+        <Link to="/">Meow!</Link>
         <Link to="/blog">Posts</Link>
         <Link to="/create">Create</Link>
 
