@@ -2,12 +2,13 @@ import { useState } from "react";
 import Header from "../components/Header/Header";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
 
 const Create = () => {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    code: "",
+    codeSnippet: "",
     categoryInput: "",
     categories: [],
   });
@@ -31,13 +32,27 @@ const Create = () => {
   };
 
   const handleSubmit = (e) => {
+    const postData = {
+      title: formData.title,
+      content: formData.content,
+      codeSnippet: formData.code,
+      categories: formData.categories,
+      date: "2024-11-03",
+    };
     e.preventDefault();
-    // axios
-    delete formData.categoryInput;
-    console.log("hi");
 
-    console.log(formData);
+    console.log(postData);
+
+    axios
+      .post("http://localhost:8090/blog/post/create", postData)
+      .then((response) => {
+        console.log("Posted successfully:", response);
+      })
+      .catch((error) => {
+        console.error("Error posting data:", error);
+      });
   };
+
   const gapSize = 400 - (formData.categories.length + 1) * 24 + "px";
   return (
     <div className="h-screen dark:bg-custm-black">
