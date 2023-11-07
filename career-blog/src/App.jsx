@@ -6,10 +6,11 @@ import Create from "./pages/Create";
 
 function App() {
   return (
-    <div className=" h-full bg-custm-white dark:bg-custm-black text-black dark:text-white">
+    <div className=" h-screen bg-custm-white dark:bg-custm-black text-black dark:text-white">
       <Routes>
         <Route path="/" element={<About></About>} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog:id" element={<Blog />} />
         <Route path="/create" element={<Create />} />
       </Routes>
     </div>
