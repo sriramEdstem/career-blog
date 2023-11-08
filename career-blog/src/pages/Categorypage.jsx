@@ -2,17 +2,21 @@ import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-const Blog = () => {
+const Categorypage = () => {
   const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
   const [catg, setCatg] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const params = useParams();
+  const postId = params.ID;
+  const nav = useNavigate();
 
   useEffect(() => {
     axios
-      .get("http://localhost:8090/blog/post")
+      .get(`http://localhost:8090/blog/post/categories/${postId}`)
       .then((response) => {
         setPosts(response.data);
         console.log(response);
@@ -85,18 +89,22 @@ const Blog = () => {
       <div className="dark:bg-custm-black">
         <div className="flex flex-col justify-start  text-left mx-auto w-[50%]">
           <h1 className="mt-8">tags:</h1>
-          <div className=" flex gap-5  ">
+          <div className=" ">
+            <span
+              onClick={() => nav("/blog")}
+              className="mr-4 cursor-pointer text-[14px] dark:text-white px-2 py-1 dark:bg-light-brown dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black  leading-0 text-black transition-all duration-300"
+            >
+              #AllCategory
+            </span>
             {catg.map((item, index) => (
-              <Link key={index} to={`category/${item}`}>
-                <div className="">
-                  <p
-                    onClick={() => setSelectedCategory(item)}
-                    className="cursor-pointer text-[14px] dark:text-white  px-2 py-1  dark:bg-light-brown dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black leading-0 text-black transition-all duration-300"
-                  >
-                    {"#" + item}
-                  </p>
-                </div>
-              </Link>
+              <span
+                key={index}
+                onClick={() => setSelectedCategory(item)}
+                className="mr-4 cursor-pointer text-[14px] dark:text-white  px-2 py-1  dark:bg-light-brown dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black leading-0 text-black transition-all duration-300"
+              >
+                {"#"}
+                {item}
+              </span>
             ))}
           </div>
           {years.map((year) => (
@@ -167,7 +175,7 @@ const Blog = () => {
   );
 };
 
-export default Blog;
+export default Categorypage;
 
 // const filteredPosts = posts.filter((post) => {
 //   if (Array.isArray(post.categories)) {

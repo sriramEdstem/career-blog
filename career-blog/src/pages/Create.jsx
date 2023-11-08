@@ -1,10 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header/Header";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 
 const Create = () => {
+  const [iD, setID] = useState(null);
+  useEffect(() => {
+    // Get the URLSearchParams object
+    const urlSearchParams = new URLSearchParams(window.location.search);
+
+    // Get the value of the 'edit' parameter
+    const editValue = urlSearchParams.get("edit");
+
+    if (editValue) {
+      setID(editValue);
+      axios
+        .get(`http://localhost:8090/blog/post/${editValue}`)
+        .then((response) => {
+          const postData = response.data;
+          setEdit(true);
+          setFormData({
+            title: postData.title || "",
+            content: postData.content || "",
+            code: postData.codeSnippet || "",
+            categories: postData.categories || [],
+            categoryInput: "",
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching data for editing:", error);
+        });
+    }
+  }, []);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -12,7 +40,7 @@ const Create = () => {
     categoryInput: "",
     categories: [],
   });
-
+  const [edit, setEdit] = useState(false);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -32,25 +60,38 @@ const Create = () => {
   };
 
   const handleSubmit = (e) => {
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split("T")[0];
+
     const postData = {
       title: formData.title,
       content: formData.content,
       codeSnippet: formData.code,
       categories: formData.categories,
-      date: "2024-11-03",
+      date: formattedDate,
     };
-    e.preventDefault();
 
-    console.log(postData);
-
-    axios
-      .post("http://localhost:8090/blog/post/create", postData)
-      .then((response) => {
-        console.log("Posted successfully:", response);
-      })
-      .catch((error) => {
-        console.error("Error posting data:", error);
-      });
+    if (edit) {
+      // If in edit mode, make a PUT request
+      axios
+        .put(`http://localhost:8090/blog/post/update/${iD}`, postData)
+        .then((response) => {
+          console.log("Updated successfully:", response);
+        })
+        .catch((error) => {
+          console.error("Error updating data:", error);
+        });
+    } else {
+      // If not in edit mode, make a POST request
+      axios
+        .post("http://localhost:8090/blog/post/create", postData)
+        .then((response) => {
+          console.log("Posted successfully:", response);
+        })
+        .catch((error) => {
+          console.error("Error posting data:", error);
+        });
+    }
   };
 
   const gapSize = 400 - (formData.categories.length + 1) * 24 + "px";
@@ -63,6 +104,7 @@ const Create = () => {
             <h1 className=" text-xl pb-2">Create Blog</h1>
             <div>
               <input
+                required
                 type="text"
                 name="title"
                 placeholder="Title"
@@ -126,22 +168,25 @@ const Create = () => {
               </div>
             </div>
             <div className="flex items-center justify-center gap-8 flex-col px-2">
-              <div>
-                <button
-                  type="submit"
-                  className="px-2 bg-yellow-300 dark:text-black hover:bg-yellow-400"
-                >
-                  Save as a draft
-                </button>
-              </div>
-              <div>
-                <button
-                  type="submit"
-                  className="px-10 py-4 bg-green-300 dark:text-black  hover:bg-green-400"
-                >
-                  Publish
-                </button>
-              </div>
+              {edit ? (
+                <div>
+                  <button
+                    type="submit"
+                    className="px-10 py-4 bg-yellow-300 dark:text-black hover-bg-yellow-400"
+                  >
+                    Update
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <button
+                    type="submit"
+                    className="px-10 py-4 bg-green-300 dark:text-black hover-bg-green-400"
+                  >
+                    Publish
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -24,6 +24,7 @@ function Header() {
         </div>
         <Link to="/">Meow!</Link>
         <Link to="/blog">Posts</Link>
+
         <Link to="/create">Create</Link>
 
         <DarkLight></DarkLight>

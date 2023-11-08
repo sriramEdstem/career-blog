@@ -4,6 +4,7 @@ import Blog from "./pages/Blog";
 import { Routes, Route } from "react-router-dom";
 import Create from "./pages/Create";
 import Singlepost from "./pages/Singlepost";
+import Categorypage from "./pages/Categorypage";
 
 function App() {
   return (
@@ -12,6 +13,10 @@ function App() {
         <Route path="/" element={<About></About>} />
         <Route path="/blog" element={<Blog />} />
         <Route path="blogs/:id" element={<Singlepost />} />
+        <Route
+          path="/blog/category/:ID"
+          element={<Categorypage></Categorypage>}
+        />
         <Route path="/create" element={<Create />} />
       </Routes>
     </div>
