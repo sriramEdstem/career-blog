@@ -10,7 +10,7 @@ const About = () => {
     <>
       <Header></Header>
       <div className=" w-[100vh] flex flex-col gap-10 mt-10 items-center mx-auto">
-        <h1 className=" text-4xl">Fluffy McFlufferson</h1>
+        <h1 className=" text-4xl">BOB</h1>
         <img src={cat} alt="cat"></img>
         <div>
           <p>
