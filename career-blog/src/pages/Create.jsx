@@ -3,21 +3,27 @@ import Header from "../components/Header/Header";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Create = () => {
   const [iD, setID] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+
   useEffect(() => {
-    // Get the URLSearchParams object
     const urlSearchParams = new URLSearchParams(window.location.search);
 
-    // Get the value of the 'edit' parameter
     const editValue = urlSearchParams.get("edit");
 
     if (editValue) {
       setID(editValue);
       axios
-        .get(`http://localhost:8090/blog/post/${editValue}`)
+        .get(`http://localhost:8090/blog/post/${editValue}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
+          console.log(response.data);
           const postData = response.data;
           setEdit(true);
           setFormData({
@@ -72,9 +78,12 @@ const Create = () => {
     };
 
     if (edit) {
-      // If in edit mode, make a PUT request
       axios
-        .put(`http://localhost:8090/blog/post/update/${iD}`, postData)
+        .put(`http://localhost:8090/blog/post/update/${iD}`, postData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
           console.log("Updated successfully:", response);
         })
@@ -82,9 +91,13 @@ const Create = () => {
           console.error("Error updating data:", error);
         });
     } else {
-      // If not in edit mode, make a POST request
+      console.log(token);
       axios
-        .post("http://localhost:8090/blog/post/create", postData)
+        .post("http://localhost:8090/blog/post/create", postData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
           console.log("Posted successfully:", response);
         })

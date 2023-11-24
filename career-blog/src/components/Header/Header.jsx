@@ -1,10 +1,20 @@
+import { useDispatch, useSelector } from "react-redux";
 import DarkLight from "./DarkLight";
 import "./Header.css";
 import { Link } from "react-router-dom";
+import { logout } from "../../authSlice";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
   const currTime = getCurrentTime();
   const location = "Kochi";
+  const token = useSelector((state) => state.auth.token);
 
   function getCurrentTime() {
     const now = new Date();
@@ -16,18 +26,27 @@ function Header() {
     return `${dayOfWeek}   ${hours}:${minutes},`;
   }
   return (
-    <div className=" border-b-2 dark:border-white pt-2 dark:border-opacity-40 pb-8 text-black text-2xl dark:text-white header">
-      <div className="flex items-center pt-4 justify-evenly">
-        <div className="flex gap-3 pr-10">
-          <p className="  ">{currTime}</p>
-          <p className=" ">{location}</p>
+    <div>
+      <div className=" border-b-2 dark:border-white pt-2 dark:border-opacity-40 pb-8 text-black text-2xl dark:text-white header">
+        <div className="flex items-center pt-4 justify-evenly">
+          <div className="flex gap-3 pr-10">
+            <p className="  ">{currTime}</p>
+            <p className=" ">{location}</p>
+          </div>
+          <Link to="/">AboutMe</Link>
+          <Link to="/blog">Posts</Link>
+
+          {token && <Link to="/create">Create</Link>}
+          {token ? (
+            <span className=" cursor-pointer" onClick={handleLogout}>
+              Logout
+            </span>
+          ) : (
+            <Link to="/login">Login</Link>
+          )}
+
+          <DarkLight></DarkLight>
         </div>
-        <Link to="/">Meow!</Link>
-        <Link to="/blog">Posts</Link>
-
-        <Link to="/create">Create</Link>
-
-        <DarkLight></DarkLight>
       </div>
     </div>
   );

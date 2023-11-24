@@ -2,167 +2,195 @@ import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-
+import Search from "../components/Search";
+import { useSelector } from "react-redux";
 const Blog = () => {
   const [posts, setPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 10;
-  const [catg, setCatg] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPage, setTotalPage] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+  // const [currentPage, setCurrentPage] = useState(1);
+  // const postsPerPage = 10;
+  // const [catg, setCatg] = useState([]);
+  // const [selectedCategory, setSelectedCategory] = useState(null);
+  // const [search, setSearch] = useState(false);
 
   useEffect(() => {
+    console.log(currentPage);
+
+    console.log(token);
     axios
-      .get("http://localhost:8090/blog/post")
-      .then((response) => {
-        setPosts(response.data);
-        console.log(response);
-        const categoriesArray = response.data.map((item) => item.categories);
-        const combinedCategories = categoriesArray.reduce(
-          (result, categories) => {
-            if (categories) {
-              categories.forEach((category) => {
-                if (!result.includes(category)) {
-                  result.push(category);
-                }
-              });
-            }
-            return result;
+      .post(
+        "http://localhost:8090/blog/post/list",
+        {
+          pageNumber: currentPage,
+          pageSize: 10,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          []
-        );
-        setCatg(combinedCategories);
+        }
+      )
+      .then((response) => {
+        setPosts(response.data.posts);
+        console.log(response.data);
+        const totalPosts = response.data.totalPosts || 0;
+        const calculatedTotalPages = Math.ceil(totalPosts / 10);
+        setTotalPage(calculatedTotalPages);
+        // const categoriesArray = response.data.content.map(
+        //   (item) => item.categories
+        // );
+        // const combinedCategories = categoriesArray.reduce(
+        //   (result, categories) => {
+        //     if (categories) {
+        //       categories.forEach((category) => {
+        //         if (!result.includes(category)) {
+        //           result.push(category);
+        //         }
+        //       });
+        //     }
+        //     return result;
+        //   },
+        //   []
+        // );
+        // setCatg(combinedCategories);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
       });
-  }, []);
+  }, [currentPage]);
 
-  const postsWithYear = posts.map((post) => ({
-    ...post,
-    year: new Date(post.date).getFullYear(),
-  }));
+  const formatDate = (dateString) => {
+    if (!dateString) return null;
 
-  const postsByYear = postsWithYear.reduce((acc, post) => {
-    if (!acc[post.year]) {
-      acc[post.year] = [];
-    }
-    acc[post.year].push(post);
-    return acc;
-  }, {});
+    const date = new Date(dateString);
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
 
-  const previous = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+
+    return `${day} ${monthNames[monthIndex]} ${year}`;
   };
 
-  const totalPagess = Math.ceil(
-    Object.values(postsByYear).flat().length / postsPerPage
-  );
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const nextPage = () => {
-    const totalPages = Math.ceil(
-      Object.values(postsByYear).flat().length / postsPerPage
-    );
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
+  const handleInputChange = async (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    // try {
+    //   await handleSearch(query);
+    // } catch (error) {
+    //   console.error("Error searching:", error);
+    // }
   };
-
-  const formatDate = (date) => {
-    const options = { month: "short", day: "numeric" };
-    return new Date(date).toLocaleDateString(undefined, options);
-  };
-
-  const years = Object.keys(postsByYear).sort((a, b) => b - a);
-
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
 
   return (
     <div className="h-screen dark:bg-custm-black">
       <Header></Header>
-      <div className="dark:bg-custm-black">
-        <div className="flex flex-col justify-start  text-left mx-auto w-[50%]">
-          <h1 className="mt-8">tags:</h1>
-          <div className=" flex gap-5  ">
-            {catg.map((item, index) => (
-              <Link key={index} to={`category/${item}`}>
-                <div className="">
-                  <p
-                    onClick={() => setSelectedCategory(item)}
-                    className="cursor-pointer text-[14px] dark:text-white  px-2 py-1  dark:bg-light-brown dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black leading-0 text-black transition-all duration-300"
-                  >
-                    {"#" + item}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </div>
-          {years.map((year) => (
-            <div key={year} className=" flex flex-col gap-12 mt-12">
-              <h2 className="font-semibold text-xl">{year}</h2>
-              <div className="flex flex-col gap-16">
-                {postsByYear[year]
-                  .slice(indexOfFirstPost, indexOfLastPost)
-                  .map((post) => {
-                    console.log("i", post);
-                    return (
-                      <div key={post.id} className="post">
+      <div className="  mx-auto flex flex-col items-center mt-4">
+        <label className="relative">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-6 h-6 pointer-events-none absolute top-6 transform -translate-y-1/2 left-28 opacity-50"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+            />
+          </svg>
+        </label>
+        <input
+          className="dark:bg-black border-slate-200 rounded-full w-80 h-12 pl-4 placeholder:pl-2 border-4"
+          placeholder="Search"
+          value={searchQuery}
+          onChange={handleInputChange}
+        />
+      </div>
+      {searchQuery ? (
+        <Search searchQuery={searchQuery}></Search>
+      ) : (
+        <div className="dark:bg-custm-black">
+          <div className="flex flex-col justify-start text-left mx-auto w-[50%]">
+            {posts.map((post) => (
+              <div key={post.id} className="flex flex-col gap-12 mt-12">
+                <div className="flex flex-col gap-16">
+                  <div key={post.id} className="post">
+                    <div className="flex">
+                      <div className="text-base font-extralight pt-[1px] w-30 pr-10">
+                        {post.updatedTime ? (
+                          <p>{formatDate(post.updatedTime)}</p>
+                        ) : (
+                          <p>{formatDate(post.createdTime)}</p>
+                        )}
+                      </div>
+                      <div>
                         <div className="flex items-center">
-                          <div className="text-base font-extralight pt-[1px] w-20">
-                            {formatDate(post.date)}
-                          </div>
                           <Link to={`/blogs/${post.id}`}>
                             <h1 className="dark:text-white dark:hover:bg-opacity-50 dark:bg-opacity-70 dark:bg-blue-300 hover:bg-blue-100 bg-opacity-50 bg-blue-300 hover:text-black hover:bg-opacity-70 px-4 text-black text-lg transition-all duration-300">
                               {post.title}
                             </h1>
                           </Link>
                         </div>
-                        {(!selectedCategory ||
-                          post.categories.includes(selectedCategory)) && (
-                          <div className=" mt-4">
-                            {Array.isArray(post.categories) &&
-                              post.categories.map((category, index) => (
-                                <span
-                                  key={index}
-                                  onClick={() => setSelectedCategory(category)}
-                                  className=" mr-2 text-[14px]  px-2 dark:text-white dark:bg-light-brown cursor-pointer  dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold  bg-light-gold hover:text-black py-1 leading-0 text-black transition-all duration-300"
-                                >
+                        <div className="mt-4  ">
+                          {Array.isArray(post.categories) &&
+                            post.categories.map((category, index) => (
+                              <span
+                                key={index}
+                                className="mr-2  text-[14px] px-2 dark:text-white dark:bg-light-brown cursor-pointer dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black py-1 leading-0 text-black transition-all duration-300"
+                              >
+                                <Link to={`/blog/category/${category}`}>
                                   {"#"}
                                   {category}
-                                </span>
-                              ))}
-                          </div>
-                        )}
+                                </Link>
+                              </span>
+                            ))}
+                        </div>
                       </div>
-                    );
-                  })}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
           <div className="flex justify-center gap-10 mt-14">
-            <div>
-              <button
-                disabled={currentPage <= 1}
-                className="dark:text-black disabled:bg-slate-300 disabled:opacity-60 px-2 py-1 rounded bg-slate-200"
-                onClick={previous}
-              >
-                Previous Page
-              </button>
-            </div>
-            <div>
-              <button
-                disabled={currentPage >= totalPagess}
-                className=" dark:text-black disabled:bg-slate-300 disabled:opacity-60  px-2 py-1 rounded bg-slate-200"
-                onClick={nextPage}
-              >
-                Next Page
-              </button>
-            </div>
+            <button
+              disabled={currentPage === 0}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              className="dark:text-black disabled:bg-slate-300 disabled:opacity-60 px-2 py-1 rounded bg-slate-200"
+            >
+              Previous Page
+            </button>
+            <button
+              disabled={currentPage == totalPage - 1}
+              onClick={() => setCurrentPage(currentPage + 1)}
+              className=" dark:text-black disabled:bg-slate-300 disabled:opacity-60  px-2 py-1 rounded bg-slate-200"
+            >
+              Next Page
+            </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

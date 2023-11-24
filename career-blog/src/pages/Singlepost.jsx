@@ -2,18 +2,49 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header/Header";
+import { useSelector } from "react-redux";
 
 const Singlepost = () => {
   const [post, setPost] = useState(null);
-  const [formatDate, setFormatDate] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
 
   const params = useParams();
   const postId = params.id;
   const nav = useNavigate();
+  const formatDatee = (dateString) => {
+    if (!dateString) return null;
+
+    const date = new Date(dateString);
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+
+    const day = date.getDate();
+    const monthIndex = date.getMonth();
+    const year = date.getFullYear();
+
+    return `${day} ${monthNames[monthIndex]} ${year}`;
+  };
 
   const removeItem = () => {
     axios
-      .delete(`http://localhost:8090/blog/post/${postId}`)
+      .delete(`http://localhost:8090/blog/post/${postId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then(() => {
         nav("/blog");
       })
@@ -23,38 +54,18 @@ const Singlepost = () => {
   };
 
   useEffect(() => {
+    console.log(postId, token);
     const postUrl = `http://localhost:8090/blog/post/${postId}`;
 
     axios
-      .get(postUrl)
+      .get(postUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
+        console.log(response.data);
         setPost(response.data);
-
-        const dateString = response.data.date;
-        console.log(dateString);
-        const date = new Date(dateString);
-
-        const months = [
-          "JANUARY",
-          "FEBRUARY",
-          "MARCH",
-          "APRIL",
-          "MAY",
-          "JUNE",
-          "JULY",
-          "AUGUST",
-          "SEPTEMBER",
-          "OCTOBER",
-          "NOVEMBER",
-          "DECEMBER",
-        ];
-
-        const day = date.getDate();
-        const month = months[date.getMonth()];
-        const year = date.getFullYear();
-
-        setFormatDate(`${day} ${month}, ${year}`);
-        console.log(response);
       })
       .catch((error) => {
         console.error("Error fetching post data:", error);
@@ -69,7 +80,7 @@ const Singlepost = () => {
     <>
       <div className=" flex flex-col gap-16">
         <Header></Header>
-        <div className="flex flex-col gap-6 justify-start h-[100vh] text-left mx-auto w-[50%]">
+        <div className="flex flex-col gap-6 h-[100%] dark:bg-custm-black justify-start h-[100vh] text-left mx-auto w-[50%]">
           <h1 className=" text-5xl font-semibold">{post.title}</h1>
           <div className=" mt-4 flex justify-between">
             <div>
@@ -84,23 +95,32 @@ const Singlepost = () => {
                 ))}
             </div>
             <div>
-              <div className="flex gap-6">
-                <Link to={`/create?edit=${post.id}`} state={post}>
-                  <button>Edit</button>
-                </Link>
-                <button onClick={removeItem}>Remove</button>
-              </div>
+              {role === "ADMIN" && (
+                <div className="flex gap-6">
+                  <Link to={`/create?edit=${post.id}`} state={post}>
+                    <button>Edit</button>
+                  </Link>
+                  <button onClick={removeItem}>Remove</button>
+                </div>
+              )}
             </div>
           </div>
           <div>
-            <p className=" text-sm opacity-60">PUBLISHED ON {formatDate}</p>
+            <p className=" text-sm opacity-60">
+              PUBLISHED ON{" "}
+              {post.updatedTime ? (
+                <span>{formatDatee(post.updatedTime)}</span>
+              ) : (
+                <span>{formatDatee(post.createdTime)}</span>
+              )}
+            </p>
           </div>
           <div
             className=" leading-9"
             dangerouslySetInnerHTML={{ __html: post.content }}
           ></div>
           {post.codeSnippet && (
-            <pre className=" bg-orange-200 bg-opacity-60 py-5 px-4">
+            <pre className=" bg-orange-200 mb-11 bg-opacity-60 py-8 px-5">
               {post.codeSnippet}
             </pre>
           )}

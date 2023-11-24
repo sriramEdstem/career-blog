@@ -1,7 +1,11 @@
 import Header from "../components/Header/Header";
 import cat from "../assets/images.jpg";
+import { useSelector } from "react-redux";
 
 const About = () => {
+  const role = useSelector((state) => state.auth.role);
+  console.log(role);
+
   return (
     <>
       <Header></Header>
@@ -10,8 +14,9 @@ const About = () => {
         <img src={cat} alt="cat"></img>
         <div>
           <p>
-            I am a cat who loves to code. I have been programming since I was a
-            kitten, and I enjoy solving complex problems with elegant solutions.
+            <span className=" font-bold text-lg">I am</span> a cat who loves to
+            code. I have been programming since I was a kitten, and I enjoy
+            solving complex problems with elegant solutions.
           </p>
           <p>
             I have experience in web development, data science, machine
@@ -25,29 +30,35 @@ const About = () => {
           </p>
         </div>
         <div>
-          <h1>Projects</h1>
+          <h1 className=" mx-5 my-5 font-bold text-2xl">Projects</h1>
           <div>
-            <p>ProjectsCatnipCatnip</p>
+            <p className="my-5 font-bold text-xl">ProjectsCatnipCatnip</p>
             <p>
-              It is a social media platform for cats. It allows users to create
-              profiles, upload photos and videos, follow other cats, like and
-              comment on posts, and chat with friends. Catnip uses Django for
-              the backend, React for the frontend, and PostgreSQL for the
-              database. It also implements machine learning models to provide
-              personalized recommendations, sentiment analysis, and image
-              recognition.
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book. It has
+              survived not only five centuries, but also the leap into
+              electronic typesetting, remaining essentially unchanged. It was
+              popularised in the 1960s with the release of Letraset sheets
+              containing Lorem Ipsum passages, and more recently with desktop
+              publishing software like Aldus PageMaker including versions of
+              Lorem Ipsum.
             </p>
           </div>
           <div>
-            <p>ProjectsCatnipCatnip</p>
+            <p className="my-5 font-bold text-xl">PurrfectPurrfect</p>
             <p>
-              It is a social media platform for cats. It allows users to create
-              profiles, upload photos and videos, follow other cats, like and
-              comment on posts, and chat with friends. Catnip uses Django for
-              the backend, React for the frontend, and PostgreSQL for the
-              database. It also implements machine learning models to provide
-              personalized recommendations, sentiment analysis, and image
-              recognition.
+              Lorem Ipsum is simply dummy text of the printing and typesetting
+              industry. Lorem Ipsum has been the industry's standard dummy text
+              ever since the 1500s, when an unknown printer took a galley of
+              type and scrambled it to make a type specimen book. It has
+              survived not only five centuries, but also the leap into
+              electronic typesetting, remaining essentially unchanged. It was
+              popularised in the 1960s with the release of Letraset sheets
+              containing Lorem Ipsum passages, and more recently with desktop
+              publishing software like Aldus PageMaker including versions of
+              Lorem Ipsum.
             </p>
           </div>
         </div>
