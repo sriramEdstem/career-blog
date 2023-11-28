@@ -9,11 +9,6 @@ const Blog = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPage, setTotalPage] = useState(null);
   const token = useSelector((state) => state.auth.token);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const postsPerPage = 10;
-  // const [catg, setCatg] = useState([]);
-  // const [selectedCategory, setSelectedCategory] = useState(null);
-  // const [search, setSearch] = useState(false);
 
   useEffect(() => {
     console.log(currentPage);
@@ -38,23 +33,6 @@ const Blog = () => {
         const totalPosts = response.data.totalPosts || 0;
         const calculatedTotalPages = Math.ceil(totalPosts / 10);
         setTotalPage(calculatedTotalPages);
-        // const categoriesArray = response.data.content.map(
-        //   (item) => item.categories
-        // );
-        // const combinedCategories = categoriesArray.reduce(
-        //   (result, categories) => {
-        //     if (categories) {
-        //       categories.forEach((category) => {
-        //         if (!result.includes(category)) {
-        //           result.push(category);
-        //         }
-        //       });
-        //     }
-        //     return result;
-        //   },
-        //   []
-        // );
-        // setCatg(combinedCategories);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -92,12 +70,6 @@ const Blog = () => {
   const handleInputChange = async (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-
-    // try {
-    //   await handleSearch(query);
-    // } catch (error) {
-    //   console.error("Error searching:", error);
-    // }
   };
 
   return (
@@ -196,10 +168,3 @@ const Blog = () => {
 };
 
 export default Blog;
-
-// const filteredPosts = posts.filter((post) => {
-//   if (Array.isArray(post.categories)) {
-//     return post.categories.includes("2023");
-//   }
-//   return false;
-// })

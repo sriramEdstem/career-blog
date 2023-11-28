@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
+import { register } from "../service";
 
 const initialState = {
   loading: false,
@@ -7,12 +7,9 @@ const initialState = {
   successMessage: null,
 };
 
-export const postData = createAsyncThunk("type/postData", async (data) => {
+export const registerUser = createAsyncThunk("type/postData", async (data) => {
   try {
-    const response = await axios.post(
-      "http://localhost:8090/security/signup",
-      data
-    );
+    const response = await register(data);
     console.log("gi", data);
 
     return response.data;
@@ -28,15 +25,15 @@ const regSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(postData.pending, (state) => {
+      .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(postData.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state) => {
         state.loading = false;
         state.successMessage = "Registration successful!";
       })
-      .addCase(postData.rejected, (state, action) => {
+      .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

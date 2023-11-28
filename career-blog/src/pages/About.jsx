@@ -1,11 +1,7 @@
 import Header from "../components/Header/Header";
 import cat from "../assets/images.jpg";
-import { useSelector } from "react-redux";
 
 const About = () => {
-  const role = useSelector((state) => state.auth.role);
-  console.log(role);
-
   return (
     <>
       <Header></Header>

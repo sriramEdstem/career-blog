@@ -78,9 +78,9 @@ const Singlepost = () => {
 
   return (
     <>
-      <div className=" flex flex-col gap-16">
+      <div className=" flex flex-col gap-16 dark:bg-custm-black h-[100vh]">
         <Header></Header>
-        <div className="flex flex-col gap-6 h-[100%] dark:bg-custm-black justify-start h-[100vh] text-left mx-auto w-[50%]">
+        <div className="flex flex-col gap-6 h-[100%] dark:bg-custm-black justify-start h-auto text-left mx-auto w-[50%]">
           <h1 className=" text-5xl font-semibold">{post.title}</h1>
           <div className=" mt-4 flex justify-between">
             <div>

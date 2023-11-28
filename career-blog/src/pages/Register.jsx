@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
-import { postData } from "../regSlice";
+import { registerUser } from "../regSlice";
 import DarkLight from "../components/Header/DarkLight";
 
 const RegistrationForm = () => {
@@ -18,7 +18,7 @@ const RegistrationForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(postData({ name, email, password }));
+    dispatch(registerUser({ name, email, password }));
   };
 
   return (

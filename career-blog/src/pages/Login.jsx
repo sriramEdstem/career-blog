@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../authSlice";
+import { loginUser } from "../authSlice";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Header from "../components/Header/Header";
 import DarkLight from "../components/Header/DarkLight";
@@ -20,9 +20,9 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const actionResult = await dispatch(login({ email, password }));
+    const actionResult = await dispatch(loginUser({ email, password }));
 
-    if (login.fulfilled.match(actionResult)) {
+    if (loginUser.fulfilled.match(actionResult)) {
       navigate(from, { replace: true });
     } else {
       setError("Password or Email is incorrect");
