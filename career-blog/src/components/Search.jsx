@@ -1,35 +1,20 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
+import { searchPosts } from "../blogSlice";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 const Search = ({ searchQuery }) => {
-  const [searchResults, setSearchResults] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
+  const searchResults = useSelector((state) => state.blog.searchResults);
 
   useEffect(() => {
     if (searchQuery) {
-      handleSearch(searchQuery);
+      dispatch(searchPosts({ query: searchQuery, token }));
     }
-  }, [searchQuery]);
+  }, [searchQuery, dispatch, token]);
 
-  const handleSearch = async (query) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8090/blog/post/search?query=${query}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setSearchResults(response.data);
-      console.log("Search results:", response.data);
-    } catch (error) {
-      console.error("Error searching:", error);
-    }
-  };
   const formatDate = (dateString) => {
     if (!dateString) return null;
 

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../regSlice";
@@ -36,7 +36,7 @@ const RegistrationForm = () => {
           <div>
             <input
               type="name"
-              className="border-2 py-3 dark:bg-custm-black"
+              className=" px-4 border-2 py-3 dark:bg-custm-black"
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -44,7 +44,7 @@ const RegistrationForm = () => {
           </div>
           <div>
             <input
-              className="border-2 py-3 dark:bg-custm-black "
+              className=" px-4 border-2 py-3 dark:bg-custm-black "
               type="email"
               placeholder="Email"
               value={email}
@@ -53,7 +53,7 @@ const RegistrationForm = () => {
           </div>
           <div>
             <input
-              className="border-2 py-3 dark:bg-custm-black"
+              className="px-4 border-2 py-3 dark:bg-custm-black"
               type="password"
               placeholder="Password"
               value={password}

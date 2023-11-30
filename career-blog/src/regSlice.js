@@ -10,11 +10,9 @@ const initialState = {
 export const registerUser = createAsyncThunk("type/postData", async (data) => {
   try {
     const response = await register(data);
-    console.log("gi", data);
 
     return response.data;
   } catch (err) {
-    console.log(data);
     return err.response.data;
   }
 });

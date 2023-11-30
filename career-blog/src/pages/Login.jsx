@@ -1,14 +1,12 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { loginUser } from "../authSlice";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import Header from "../components/Header/Header";
 import DarkLight from "../components/Header/DarkLight";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const token = useSelector((state) => state.auth.token);
   const [error, setError] = useState("");
 
   const dispatch = useDispatch();
@@ -46,12 +44,12 @@ const Login = () => {
             placeholder="Email"
             name="email"
             value={email}
-            className="border-2 py-3 dark:bg-custm-black"
+            className="px-4 border-2 py-3 dark:bg-custm-black"
             onChange={(e) => setEmail(e.target.value)}
           />
           <input
             required
-            className="border-2 py-3 dark:bg-custm-black"
+            className=" px-4 border-2 py-3 dark:bg-custm-black"
             type="password"
             placeholder="Password"
             name="password"

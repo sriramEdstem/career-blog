@@ -1,44 +1,24 @@
 import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import Search from "../components/Search";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { blogs } from "../blogSlice";
 const Blog = () => {
-  const [posts, setPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPage, setTotalPage] = useState(null);
   const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
+  let totalPage;
 
   useEffect(() => {
-    console.log(currentPage);
+    dispatch(blogs({ pageNumber: currentPage, token }));
+  }, [currentPage, dispatch, token]);
 
-    console.log(token);
-    axios
-      .post(
-        "http://localhost:8090/blog/post/list",
-        {
-          pageNumber: currentPage,
-          pageSize: 10,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((response) => {
-        setPosts(response.data.posts);
-        console.log(response.data);
-        const totalPosts = response.data.totalPosts || 0;
-        const calculatedTotalPages = Math.ceil(totalPosts / 10);
-        setTotalPage(calculatedTotalPages);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, [currentPage]);
+  const blog = useSelector((state) => state.blog.posts);
+  const totalPosts = useSelector((state) => state.blog.totalPosts);
+  totalPage = Math.ceil(totalPosts / 10);
 
+  const posts = blog || [];
   const formatDate = (dateString) => {
     if (!dateString) return null;
 
@@ -104,46 +84,47 @@ const Blog = () => {
       ) : (
         <div className="dark:bg-custm-black">
           <div className="flex flex-col justify-start text-left mx-auto w-[50%]">
-            {posts.map((post) => (
-              <div key={post.id} className="flex flex-col gap-12 mt-12">
-                <div className="flex flex-col gap-16">
-                  <div key={post.id} className="post">
-                    <div className="flex">
-                      <div className="text-base font-extralight pt-[1px] w-30 pr-10">
-                        {post.updatedTime ? (
-                          <p>{formatDate(post.updatedTime)}</p>
-                        ) : (
-                          <p>{formatDate(post.createdTime)}</p>
-                        )}
-                      </div>
-                      <div>
-                        <div className="flex items-center">
-                          <Link to={`/blogs/${post.id}`}>
-                            <h1 className="dark:text-white dark:hover:bg-opacity-50 dark:bg-opacity-70 dark:bg-blue-300 hover:bg-blue-100 bg-opacity-50 bg-blue-300 hover:text-black hover:bg-opacity-70 px-4 text-black text-lg transition-all duration-300">
-                              {post.title}
-                            </h1>
-                          </Link>
+            {posts &&
+              posts.map((post) => (
+                <div key={post.id} className="flex flex-col gap-12 mt-12">
+                  <div className="flex flex-col gap-16">
+                    <div key={post.id} className="post">
+                      <div className="flex">
+                        <div className="text-base font-extralight pt-[1px] w-30 pr-10">
+                          {post.updatedTime ? (
+                            <p>{formatDate(post.updatedTime)}</p>
+                          ) : (
+                            <p>{formatDate(post.createdTime)}</p>
+                          )}
                         </div>
-                        <div className="mt-4  ">
-                          {Array.isArray(post.categories) &&
-                            post.categories.map((category, index) => (
-                              <span
-                                key={index}
-                                className="mr-2  text-[14px] px-2 dark:text-white dark:bg-light-brown cursor-pointer dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black py-1 leading-0 text-black transition-all duration-300"
-                              >
-                                <Link to={`/blog/category/${category}`}>
-                                  {"#"}
-                                  {category}
-                                </Link>
-                              </span>
-                            ))}
+                        <div>
+                          <div className="flex items-center">
+                            <Link to={`/blogs/${post.id}`}>
+                              <h1 className="dark:text-white dark:hover:bg-opacity-50 dark:bg-opacity-70 dark:bg-blue-300 hover:bg-blue-100 bg-opacity-50 bg-blue-300 hover:text-black hover:bg-opacity-70 px-4 text-black text-lg transition-all duration-300">
+                                {post.title}
+                              </h1>
+                            </Link>
+                          </div>
+                          <div className="mt-4  ">
+                            {Array.isArray(post.categories) &&
+                              post.categories.map((category, index) => (
+                                <span
+                                  key={index}
+                                  className="mr-2  text-[14px] px-2 dark:text-white dark:bg-light-brown cursor-pointer dark:hover:bg-dark-brown dark:hover:text-white hover:bg-dark-gold bg-light-gold hover:text-black py-1 leading-0 text-black transition-all duration-300"
+                                >
+                                  <Link to={`/blog/category/${category}`}>
+                                    {"#"}
+                                    {category}
+                                  </Link>
+                                </span>
+                              ))}
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
           <div className="flex justify-center gap-10 mt-14">
             <button

@@ -15,6 +15,7 @@ function Header() {
   const currTime = getCurrentTime();
   const location = "Kochi";
   const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
 
   function getCurrentTime() {
     const now = new Date();
@@ -36,7 +37,7 @@ function Header() {
           <Link to="/">AboutMe</Link>
           <Link to="/blog">Posts</Link>
 
-          {token && <Link to="/create">Create</Link>}
+          {role === "ADMIN" ? <Link to="/create">Create</Link> : ""}
           {token ? (
             <span className=" cursor-pointer" onClick={handleLogout}>
               Logout

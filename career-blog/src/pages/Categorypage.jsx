@@ -1,20 +1,20 @@
 import Header from "../components/Header/Header";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { categoryPosts } from "../blogSlice";
 
 const Categorypage = () => {
-  const [posts, setPosts] = useState([]);
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const postsPerPage = 10;
-  // const [catg, setCatg] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const params = useParams();
   const postId = params.ID;
   const nav = useNavigate();
+  const dispatch = useDispatch();
+
   const token = useSelector((state) => state.auth.token);
+  const posts = useSelector((state) => state.blog.posts);
+  const status = useSelector((state) => state.blog.status);
 
   const formatDate = (dateString) => {
     if (!dateString) return null;
@@ -43,38 +43,10 @@ const Categorypage = () => {
   };
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:8090/blog/post/categories/${postId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setPosts(response.data);
-        console.log(response);
-        // const categoriesArray = response.data.map((item) => item.categories);
-        // const combinedCategories = categoriesArray.reduce(
-        //   (result, categories) => {
-        //     if (categories) {
-        //       categories.forEach((category) => {
-        //         if (!result.includes(category)) {
-        //           result.push(category);
-        //         }
-        //       });
-        //     }
-        //     return result;
-        //   },
-        //   []
-        // );
+    dispatch(categoryPosts({ token, category: postId }));
+  }, []);
 
-        // setCatg(combinedCategories);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }, [selectedCategory]);
-
-  return (
+  return status === "succeeded" ? (
     <div className="h-screen dark:bg-custm-black">
       <Header></Header>
       <div className="dark:bg-custm-black">
@@ -141,14 +113,9 @@ const Categorypage = () => {
         </div>
       </div>
     </div>
+  ) : (
+    <h1> Loading</h1>
   );
 };
 
 export default Categorypage;
-
-// const filteredPosts = posts.filter((post) => {
-//   if (Array.isArray(post.categories)) {
-//     return post.categories.includes("2023");
-//   }
-//   return false;
-// })

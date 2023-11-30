@@ -1,17 +1,22 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header/Header";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSinglePost } from "../postDetailSlice";
 
 const Singlepost = () => {
-  const [post, setPost] = useState(null);
+  const dispatch = useDispatch();
+  const { id: postId } = useParams();
+  const post = useSelector((state) => state.singlePost.post);
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.role);
-
-  const params = useParams();
-  const postId = params.id;
   const nav = useNavigate();
+
+  useEffect(() => {
+    dispatch(fetchSinglePost({ postId, token }));
+  }, [dispatch, postId, token]);
+
   const formatDatee = (dateString) => {
     if (!dateString) return null;
 
@@ -52,29 +57,6 @@ const Singlepost = () => {
         console.error("Error deleting post:", error);
       });
   };
-
-  useEffect(() => {
-    console.log(postId, token);
-    const postUrl = `http://localhost:8090/blog/post/${postId}`;
-
-    axios
-      .get(postUrl, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-        setPost(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching post data:", error);
-      });
-  }, [postId]);
-
-  if (!post) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <>

@@ -2,43 +2,22 @@ import { useState, useEffect } from "react";
 import Header from "../components/Header/Header";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchPost,
+  createNewPost,
+  updatePost,
+  resetPostState,
+} from "../createPostSlice";
 
 const Create = () => {
-  const [iD, setID] = useState(null);
+  const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const editValue = urlSearchParams.get("edit");
+  const post = useSelector((state) => state.posts.post);
+  const loading = useSelector((state) => state.posts.loading);
 
-  useEffect(() => {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-
-    const editValue = urlSearchParams.get("edit");
-
-    if (editValue) {
-      setID(editValue);
-      axios
-        .get(`http://localhost:8090/blog/post/${editValue}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          const postData = response.data;
-          setEdit(true);
-          setFormData({
-            title: postData.title || "",
-            content: postData.content || "",
-            code: postData.codeSnippet || "",
-            categories: postData.categories || [],
-            categoryInput: "",
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching data for editing:", error);
-        });
-    }
-  }, []);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -46,14 +25,11 @@ const Create = () => {
     categoryInput: "",
     categories: [],
   });
-  const [edit, setEdit] = useState(false);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
   const handleAddCategory = (e) => {
-    console.log("h0");
     e.preventDefault();
     if (formData.categoryInput) {
       const newCategories = formData.categoryInput.split(",");
@@ -64,51 +40,43 @@ const Create = () => {
       });
     }
   };
+  useEffect(() => {
+    dispatch(resetPostState());
+    if (editValue) {
+      dispatch(fetchPost({ postId: editValue, token }));
+    }
+  }, []);
+  useEffect(() => {
+    setFormData({
+      title: post.title || "",
+      content: post.content || "",
+      codeSnippet: post.codeSnippet || "",
+      categories: post.categories || [],
+      categoryInput: "",
+    });
+  }, [post]);
 
   const handleSubmit = (e) => {
     const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split("T")[0];
+    e.preventDefault();
 
+    const formattedDate = currentDate.toISOString().split("T")[0];
     const postData = {
-      title: formData.title,
-      content: formData.content,
-      codeSnippet: formData.code,
-      categories: formData.categories,
+      ...formData,
       date: formattedDate,
     };
-
-    if (edit) {
-      axios
-        .put(`http://localhost:8090/blog/post/update/${iD}`, postData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          console.log("Updated successfully:", response);
-        })
-        .catch((error) => {
-          console.error("Error updating data:", error);
-        });
+    if (editValue) {
+      dispatch(updatePost({ postId: editValue, postData, token }));
     } else {
-      console.log(token);
-      axios
-        .post("http://localhost:8090/blog/post/create", postData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          console.log("Posted successfully:", response);
-        })
-        .catch((error) => {
-          console.error("Error posting data:", error);
-        });
+      dispatch(createNewPost(postData));
     }
   };
 
   const gapSize = 400 - (formData.categories.length + 1) * 24 + "px";
-  return (
+
+  return loading ? (
+    <h1>Loading</h1>
+  ) : (
     <div className="h-screen dark:bg-custm-black">
       <Header />
       <form onSubmit={handleSubmit}>
@@ -123,10 +91,10 @@ const Create = () => {
                 placeholder="Title"
                 value={formData.title}
                 onChange={handleInputChange}
-                className="w-[700px] text-3xl h-[50px] border-[1px] dark:bg-custm-black border-gray-400 bg-white dark:text-white"
+                className="px-4 w-[700px] text-3xl h-[50px] border-[1px] dark:bg-custm-black border-gray-400 bg-white dark:text-white"
               />
               <ReactQuill
-                className="w-[700px] h-[250px]"
+                className=" w-[700px] h-[250px]"
                 theme="snow"
                 name="content"
                 value={formData.content}
@@ -141,9 +109,9 @@ const Create = () => {
               <textarea
                 name="code"
                 placeholder="enter code "
-                value={formData.code}
+                value={formData.codeSnippet}
                 onChange={handleInputChange}
-                className="border-[1px] dark:bg-custm-black placeholder:opacity-25  placeholder:text-black dark:placeholder:text-white border-gray-400 bg-white dark:text-white w-[700px] h-[200px]"
+                className="px-4 border-[1px] dark:bg-custm-black placeholder:opacity-25  placeholder:text-black dark:placeholder:text-white border-gray-400 bg-white dark:text-white w-[700px] h-[200px]"
               />
             </div>
           </div>
@@ -157,7 +125,7 @@ const Create = () => {
                   placeholder="Categories"
                   value={formData.categoryInput}
                   onChange={handleInputChange}
-                  className="dark:text-white dark:bg-custm-black dark:placeholder:opacity-30 placeholder:text-center dark:placeholder:text-white border-cyan-200 hover:border-cyan-300 rounded-lg border-2 py-2 px-3"
+                  className="px-4 dark:text-white dark:bg-custm-black dark:placeholder:opacity-30 placeholder:text-center dark:placeholder:text-white border-cyan-200 hover:border-cyan-300 rounded-lg border-2 py-2 px-3"
                 />
                 <button
                   type="button"
@@ -181,7 +149,7 @@ const Create = () => {
               </div>
             </div>
             <div className="flex items-center justify-center gap-8 flex-col px-2">
-              {edit ? (
+              {editValue ? (
                 <div>
                   <button
                     type="submit"

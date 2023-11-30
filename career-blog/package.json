@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "local": "cross-env VITE_APP_ENV=local react-scripts start"
+    "local": "cross-env VITE_APP_ENV=local vite"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
